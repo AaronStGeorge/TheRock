@@ -23,6 +23,8 @@ if(THEROCK_ENABLE_IREE_COMPILER)
       -DIREE_BUILD_BINDINGS_TFLITE_JAVA=OFF
       # Disable runtime, it's built into fusilli, we only need the compiler
       -DIREE_HAL_DRIVER_DEFAULTS=OFF
+    INSTALL_OPTIONAL_COMPONENTS
+      IREEDevLibraries-Compiler
     BUILD_DEPS
       rocm-cmake
       hip-clr  # Provides HIP headers for IREE_USE_SYSTEM_DEPS
@@ -35,6 +37,7 @@ if(THEROCK_ENABLE_IREE_COMPILER)
     COMPONENTS
       lib
       dbg
+      dev
     SUBPROJECT_DEPS
       iree-compiler
   )
