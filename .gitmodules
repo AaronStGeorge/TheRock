@@ -35,11 +35,11 @@
 	branch = amd-decode-only
 [submodule "iree"]
 	path = iree-libs/iree
-	url = https://github.com/iree-org/iree.git
+	url = git@github.com:AaronStGeorge/iree.git
 	branch = main
 [submodule "fusilli"]
 	path = iree-libs/fusilli
-	url = https://github.com/iree-org/fusilli.git
+	url = git@github.com:AaronStGeorge/fusilli.git
 	branch = main
 [submodule "rocm-kpack"]
 	path = base/rocm-kpack
