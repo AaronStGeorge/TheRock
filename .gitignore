@@ -23,3 +23,10 @@ __pycache__
 /install/
 /output-*/
 /out/
+
+# Local build cache and config
+/.cache/
+/CMakeUserPresets.json
+
+# Debug tools (fetched during build)
+/debug-tools/
