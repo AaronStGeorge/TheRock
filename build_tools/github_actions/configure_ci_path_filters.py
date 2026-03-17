@@ -91,7 +91,9 @@ def get_git_submodule_paths(repo_root: Optional[str] = None) -> Optional[Iterabl
         return []
 
 
-def is_ci_run_required(paths: Optional[Iterable[str]]) -> bool:
+def is_ci_run_required(
+    paths: Optional[Iterable[str]], multi_arch: bool = False
+) -> bool:
     """Checks if a CI run is required based on modified file paths.
 
     CI will run if:
@@ -105,6 +107,8 @@ def is_ci_run_required(paths: Optional[Iterable[str]]) -> bool:
 
     Args:
         paths: Iterable of file paths to evaluate, or None if no files modified
+        multi_arch: If True, iree-libs/* paths are not considered skippable
+            (IREE libraries are built in multi-arch CI but not in standard CI)
 
     Returns:
         True if CI run is required, False if CI can be skipped
@@ -119,10 +123,15 @@ def is_ci_run_required(paths: Optional[Iterable[str]]) -> bool:
     )
     other_paths = paths_set - github_workflows_paths
 
+    skippable_patterns = _get_skippable_path_patterns(multi_arch)
+
     related_to_ci = _check_for_workflow_file_related_to_ci(github_workflows_paths)
-    contains_other_non_skippable_files = _check_for_non_skippable_path(other_paths)
+    contains_other_non_skippable_files = _check_for_non_skippable_path(
+        other_paths, skippable_patterns=skippable_patterns
+    )
 
     print("is_ci_run_required findings:")
+    print(f"  multi_arch: {multi_arch}")
     print(f"  related_to_ci: {related_to_ci}")
     print(f"  contains_other_non_skippable_files: {contains_other_non_skippable_files}")
 
@@ -162,6 +171,14 @@ _SKIPPABLE_PATH_PATTERNS = [
     "experimental/*",
 ]
 
+# Patterns skippable only for non-multi-arch CI. For non multi-arch CI IREE
+# libraries are disabled by default (THEROCK_ENABLE_IREE_LIBS=OFF) and iree-libs
+# submodules are not fetched, so changes to iree-libs/ are no-ops.
+# TODO: remove when IREE_LIBS defaults to ON
+_NON_MULTI_ARCH_SKIPPABLE_PATH_PATTERNS = [
+    "iree-libs/*",
+]
+
 # GitHub workflow file patterns that are considered CI-related.
 # Changes to workflow files matching these patterns will trigger CI runs,
 # as they may affect the CI pipeline itself.
@@ -184,19 +201,32 @@ _GITHUB_WORKFLOWS_CI_PATTERNS = [
 # ============================================================================
 
 
-def _is_path_skippable(path: str) -> bool:
+def _get_skippable_path_patterns(multi_arch: bool) -> list[str]:
+    """Returns the list of skippable path patterns for the given CI mode."""
+    patterns = list(_SKIPPABLE_PATH_PATTERNS)
+    if not multi_arch:
+        patterns.extend(_NON_MULTI_ARCH_SKIPPABLE_PATH_PATTERNS)
+    return patterns
+
+
+def _is_path_skippable(path: str, skippable_patterns: list[str]) -> bool:
     """Checks if a single file path matches any skippable pattern."""
-    return any(fnmatch.fnmatch(path, pattern) for pattern in _SKIPPABLE_PATH_PATTERNS)
+    return any(fnmatch.fnmatch(path, pattern) for pattern in skippable_patterns)
 
 
-def _check_for_non_skippable_path(paths: Optional[Iterable[str]]) -> bool:
+def _check_for_non_skippable_path(
+    paths: Optional[Iterable[str]],
+    skippable_patterns: Optional[list[str]] = None,
+) -> bool:
     """Checks if any path in the collection is non-skippable.
 
     Returns True if at least one path doesn't match any skippable pattern.
     """
     if paths is None:
         return False
-    return any(not _is_path_skippable(p) for p in paths)
+    if skippable_patterns is None:
+        skippable_patterns = _SKIPPABLE_PATH_PATTERNS
+    return any(not _is_path_skippable(p, skippable_patterns) for p in paths)
 
 
 def _is_path_workflow_file_related_to_ci(path: str) -> bool:

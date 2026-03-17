@@ -648,7 +648,7 @@ def main(base_args, linux_families, windows_families):
         print(f"Checking modified files since this had a {github_event_name} trigger")
         # TODO(#199): other behavior changes
         #     * workflow_dispatch or workflow_call with inputs controlling enabled jobs?
-        enable_build_jobs = is_ci_run_required(modified_paths)
+        enable_build_jobs = is_ci_run_required(modified_paths, multi_arch=multi_arch)
 
         # If the modified path contains any git submodules, we want to run a full test suite.
         # Otherwise, we just run smoke tests

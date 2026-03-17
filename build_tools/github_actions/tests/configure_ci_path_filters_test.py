@@ -55,6 +55,21 @@ class ConfigureCIPathFiltersTest(unittest.TestCase):
         run_ci = is_ci_run_required(paths)
         self.assertTrue(run_ci)
 
+    def test_dont_run_ci_if_only_iree_libs_edited(self):
+        paths = ["iree-libs/iree", "iree-libs/fusilli"]
+        run_ci = is_ci_run_required(paths)
+        self.assertFalse(run_ci)
+
+    def test_run_ci_if_iree_libs_and_source_file_edited(self):
+        paths = ["iree-libs/iree", "source_file.h"]
+        run_ci = is_ci_run_required(paths)
+        self.assertTrue(run_ci)
+
+    def test_run_multi_arch_ci_if_only_iree_libs_edited(self):
+        paths = ["iree-libs/iree", "iree-libs/fusilli"]
+        run_ci = is_ci_run_required(paths, multi_arch=True)
+        self.assertTrue(run_ci)
+
 
 if __name__ == "__main__":
     unittest.main()
