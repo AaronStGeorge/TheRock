@@ -13,8 +13,25 @@ THEROCK_DIR = SCRIPT_DIR.parent.parent.parent
 
 logging.basicConfig(level=logging.INFO)
 
-# Load test configuration from TOML (lists ALL plugins with paths/tolerances)
-config_path = SCRIPT_DIR / "hipdnn_test_config.toml"
+# Load test configuration from TOML (lists ALL plugins with paths/tolerances).
+# Prefer the installed copy (from rocm-libraries build artifact) over the
+# in-tree copy (kept as fallback during the transition period).
+_installed_config = (
+    THEROCK_BIN_DIR / "hipdnn_integration_tests_test_infra" / "hipdnn_test_config.toml"
+)
+_intree_config = SCRIPT_DIR / "hipdnn_test_config.toml"
+
+if _installed_config.is_file():
+    config_path = _installed_config
+elif _intree_config.is_file():
+    config_path = _intree_config
+else:
+    raise FileNotFoundError(
+        f"hipdnn_test_config.toml not found at either:\n"
+        f"  {_installed_config}\n"
+        f"  {_intree_config}"
+    )
+
 with open(config_path, "rb") as f:
     config = tomllib.load(f)
 logging.info(f"Loaded test config from: {config_path}")
