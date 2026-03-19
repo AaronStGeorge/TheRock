@@ -9,4 +9,5 @@ exclude = [
 include = [
   "bin/miopen_plugin*_test*",
   "bin/miopen_plugin/CTestTestfile.cmake",
+  "bin/hipdnn_integration_tests_test_infra/enabled_plugins/*",
 ]

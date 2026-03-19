@@ -71,3 +71,28 @@ function(therock_patch_linked_lib)
     endif()
   endforeach()
 endfunction()
+
+
+# Registers a hipDNN engine plugin for integration test discovery. Each provider
+# calls this from its post-hook; the marker file is installed into the
+# provider's stage directory then installed as part of that provider's test
+# artifact. The hipdnn_integration_tests  project references the combined
+# manifest when double checking that the expected plugins actually loaded.
+#
+# PLUGIN_NAME should be the C API plugin name (returned from
+# hipdnnGetEngineInfo_ext, or hipdnnPluginGetName on each plugin).
+#
+# The provider's artifact descriptor (e.g. artifact-fusilliprovider.toml) must
+# include the marker file in its test component for integration test discovery:
+#   [components.test."<stage-path>"]
+#   include = [
+#     ...existing patterns...
+#     "bin/hipdnn_integration_tests_test_infra/enabled_plugins/*",
+#   ]
+function(therock_register_hipdnn_engine_plugin PLUGIN_NAME)
+  set(_marker_dir "${CMAKE_CURRENT_BINARY_DIR}/_hipdnn_plugin_markers")
+  file(MAKE_DIRECTORY "${_marker_dir}")
+  file(WRITE "${_marker_dir}/${PLUGIN_NAME}" "")
+  install(FILES "${_marker_dir}/${PLUGIN_NAME}"
+          DESTINATION "${CMAKE_INSTALL_BINDIR}/hipdnn_integration_tests_test_infra/enabled_plugins")
+endfunction()

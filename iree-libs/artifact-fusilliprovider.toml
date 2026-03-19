@@ -8,4 +8,5 @@ exclude = [
 include = [
   "bin/fusilli_plugin_*_test",
   "bin/fusilli_plugin_test_infra/*",
+  "bin/hipdnn_integration_tests_test_infra/enabled_plugins/*",
 ]

@@ -8,4 +8,5 @@ exclude = [
 include = [
   "bin/hipblaslt_*_test*",
   "bin/hipblaslt_plugin/CTestTestfile.cmake",
+  "bin/hipdnn_integration_tests_test_infra/enabled_plugins/*",
 ]

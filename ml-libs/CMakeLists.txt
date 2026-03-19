@@ -384,33 +384,4 @@ if(THEROCK_ENABLE_HIPDNN_INTEGRATION_TESTS)
       hipdnn-integration-tests
   )
 
-  # Generate JSON manifest of plugins enabled in the current configuration of
-  # the super-build. The integration test suite will check that the expected
-  # plugins are loaded at runtime.
-  #
-  # NOTE: THEROCK_ENABLE_*PROVIDER variables are set by the build topology, so
-  # should include sub components; for example THEROCK_ENABLE_FUSILLIPROVIDER
-  # should be enabled even if the user did not explicitly provide the variable,
-  # instead providing THEROCK_ENABLE_ALL or THEROCK_ENABLE_IREE_LIBS.
-  #
-  # NOTE: we need to write this file here (as it reads cache variables from the
-  # super build) but it should install as part of the hipdnn-integration project
-  # subproject (and run through the normal build -> stage -> dist workflow)
-  # rather than install as part of the super-project - so the install happens in
-  # post_hook_hipdnn-integration-tests.cmake.
-  set(_plugins_json_array "")
-  if(THEROCK_ENABLE_MIOPENPROVIDER)
-    list(APPEND _plugins_json_array "\"miopen\"")
-  endif()
-  if(THEROCK_ENABLE_FUSILLIPROVIDER)
-    list(APPEND _plugins_json_array "\"fusilli\"")
-  endif()
-  if(THEROCK_ENABLE_HIPBLASLTPROVIDER)
-    list(APPEND _plugins_json_array "\"hipblaslt\"")
-  endif()
-  string(REPLACE ";" ", " _plugins_json_str "${_plugins_json_array}")
-
-  set(_manifest_file "${CMAKE_CURRENT_BINARY_DIR}/build_enabled_hipdnn_plugins_manifest.json")
-  file(WRITE "${_manifest_file}" "{\n  \"plugins\": [${_plugins_json_str}]\n}\n")
-
 endif(THEROCK_ENABLE_HIPDNN_INTEGRATION_TESTS)

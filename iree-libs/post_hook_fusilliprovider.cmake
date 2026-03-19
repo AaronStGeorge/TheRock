@@ -7,3 +7,5 @@ list(APPEND THEROCK_PRIVATE_INSTALL_RPATH_DIRS "lib/hipdnn_plugins/engines")
 # The plugin library is installed in lib/hipdnn_plugins/engines/, and we need to set origin properly for the RPATH to work
 set_target_properties(fusilli_plugin PROPERTIES
     THEROCK_INSTALL_RPATH_ORIGIN "lib/hipdnn_plugins/engines")
+
+therock_register_hipdnn_engine_plugin(FUSILLI_ENGINE)
