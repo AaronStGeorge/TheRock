@@ -36,7 +36,7 @@
 	branch = main
 [submodule "fusilli"]
 	path = iree-libs/fusilli
-	url = https://github.com/iree-org/fusilli.git
+	url = https://github.com/AaronStGeorge/fusilli.git
 	branch = main
 [submodule "libhipcxx"]
 	path = math-libs/libhipcxx
